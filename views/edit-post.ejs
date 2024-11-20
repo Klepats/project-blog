@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <%- include('./partials/header.ejs') %>
+  </head>
+  <body>
+    <%- include('./partials/nav.ejs') %>
+    <div class="container my-5">
+      <div class="card shadow-sm p-4">
+        <h1 class="text-center mb-4"><%= title %></h1>
+        <p class="text-center text-muted">
+          Edit the details of your post below and click "Update Post" to save changes.
+        </p>
+        <form method="POST" action="/posts/<%= post._id %>/edit">
+          <!-- Додано для підтримки PUT-запиту -->
+          <input type="hidden" name="_method" value="PUT" />
+          <div class="mb-3">
+            <label for="postTitle" class="form-label">Назва поста</label>
+            <input
+              required
+              type="text"
+              class="form-control"
+              id="postTitle"
+              name="title"
+              value="<%= post.title %>" <!-- Автозаповнення -->
+            />
+          </div>
+          <div class="mb-3">
+            <label for="postAuthor" class="form-label">Автор</label>
+            <input
+              required
+              type="text"
+              class="form-control"
+              id="postAuthor"
+              name="author"
+              value="<%= post.author %>" <!-- Автозаповнення -->
+            />
+          </div>
+          <div class="mb-3">
+            <label for="postDescription" class="form-label">Опис</label>
+            <textarea
+              required
+              class="form-control"
+              id="postDescription"
+              name="description"
+              rows="4"
+            ><%= post.description %></textarea> <!-- Автозаповнення -->
+          </div>
+          <button type="submit" class="btn btn-warning w-100">Оновити пост</button>
+        </form>
+      </div>
+    </div>
+    <%- include('./partials/footer.ejs') %>
+  </body>
+</html>

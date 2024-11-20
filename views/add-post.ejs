@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <%- include('./partials/header.ejs') %>
+  </head>
+  <body>
+    <%- include('./partials/nav.ejs') %>
+    <div class="container my-5">
+      <div class="card shadow-sm p-4">
+        <h1 class="text-center mb-4"><%= title %></h1>
+        <p class="text-center text-muted">
+          Fill out the form below to create a new post.
+        </p>
+        <form method="POST" action="/add-post">
+          <div class="mb-3">
+            <label for="postTitle" class="form-label">Назва поста</label>
+            <input
+              required
+              type="text"
+              class="form-control"
+              id="postTitle"
+              name="title"
+              placeholder="Enter post title"
+            />
+          </div>
+          <div class="mb-3">
+            <label for="postAuthor" class="form-label">Автор</label>
+            <input
+              required
+              type="text"
+              class="form-control"
+              id="postAuthor"
+              name="author"
+              placeholder="Enter author name"
+            />
+          </div>
+          <div class="mb-3">
+            <label for="postDescription" class="form-label">Опис</label>
+            <textarea
+              required
+              class="form-control"
+              id="postDescription"
+              name="description"
+              rows="4"
+              placeholder="Enter post description"
+            ></textarea>
+          </div>
+          <button type="submit" class="btn btn-success w-100">Створити пост</button>
+        </form>
+      </div>
+    </div>
+    <%- include('./partials/footer.ejs') %>
+  </body>
+</html>
