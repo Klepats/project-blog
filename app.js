@@ -1,33 +1,18 @@
 const express = require("express");
-const mongoose = require("mongoose");
+const methodOverride = require("method-override");
 const path = require("path");
-const Post = require("./models/postModel");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Налаштування підключення до MongoDB
-const db = process.env.MONGODB_URI;
+// Масив для зберігання постів
+let posts = [];
 
-// Налаштування Express
-app.set("views", path.join(__dirname, "views"));
-app.set("view engine", "ejs");
+// Middleware
 app.use(express.urlencoded({ extended: true }));
-
-// Підключення до бази даних
-async function start() {
-  try {
-    await mongoose.connect(db, { useNewUrlParser: true, useUnifiedTopology: true });
-    console.log("Connected to MongoDB");
-
-    app.listen(PORT, () => {
-      console.log(`Server is running on http://localhost:${PORT}`);
-    });
-  } catch (error) {
-    console.error("Error starting the app:", error);
-    process.exit(1); // Завершити процес із кодом помилки
-  }
-}
+app.use(methodOverride("_method"));
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
 
 // Головна сторінка
 app.get("/", (req, res) => {
@@ -35,14 +20,8 @@ app.get("/", (req, res) => {
 });
 
 // Список постів
-app.get("/posts", async (req, res) => {
-  try {
-    const posts = await Post.find();
-    res.render("posts", { posts, title: "Posts List" });
-  } catch (error) {
-    console.error(error);
-    res.render("error", { message: "Failed to load posts" });
-  }
+app.get("/posts", (req, res) => {
+  res.render("posts", { posts, title: "Posts List" });
 });
 
 // Форма для створення поста
@@ -51,51 +30,62 @@ app.get("/add-post", (req, res) => {
 });
 
 // Створення нового поста
-app.post("/add-post", async (req, res) => {
-  try {
-    const { title, author, description } = req.body;
-    const newPost = new Post({ title, author, description });
-    await newPost.save();
-    res.redirect("/posts");
-  } catch (error) {
-    console.error(error);
-    res.render("error", { message: "Failed to create post" });
-  }
+app.post('/add-post', (req, res) => {
+  const { title, author, description } = req.body;
+  const id = posts.length + 1; // Генерація ID
+  const newPost = { id, title, author, description };
+  console.log("Новий пост:", newPost); // Логування нового поста
+  posts.push(newPost);
+  res.redirect('/posts');
 });
 
-// Форма редагування поста
-app.get("/posts/:id/edit", async (req, res) => {
-  try {
-    const post = await Post.findById(req.params.id);
-    res.render("edit-post", { post, title: "Edit Post" });
-  } catch (error) {
-    console.error(error);
-    res.render("error", { message: "Failed to load post for editing" });
+
+
+// Форма для редагування поста
+app.get('/posts/:id/edit', (req, res) => {
+  console.log("ID з URL:", req.params.id); // Додай логування, щоб перевірити ID
+  const post = posts.find((p) => p.id == req.params.id); // Знайти пост у масиві
+  console.log("Знайдений пост:", post); // Перевірка, чи пост знайдено
+
+  if (!post) {
+    return res.status(404).render('error', { 
+      title: 'Error', 
+      message: 'Post not found' 
+    });
   }
+  res.render('edit-post', { post, title: 'Edit Post' });
 });
 
 // Оновлення поста
-app.post("/posts/:id/edit", async (req, res) => {
-  try {
-    const { title, author, description } = req.body;
-    await Post.findByIdAndUpdate(req.params.id, { title, author, description });
-    res.redirect("/posts");
-  } catch (error) {
-    console.error(error);
-    res.render("error", { message: "Failed to update post" });
+app.put('/posts/:id/edit', (req, res) => {
+  const { title, author, description } = req.body; // Отримуємо дані з форми
+  const post = posts.find((p) => p.id == req.params.id); // Знаходимо пост у масиві
+
+  if (post) {
+    // Оновлюємо дані поста
+    post.title = title;
+    post.author = author;
+    post.description = description;
+
+    console.log("Оновлений пост:", post); // Логування оновленого поста
+  } else {
+    return res.status(404).render('error', { 
+      title: 'Error', 
+      message: 'Post not found' 
+    });
   }
+
+  res.redirect('/posts'); // Повертаємося до списку постів
 });
+
 
 // Видалення поста
-app.post("/posts/:id/delete", async (req, res) => {
-  try {
-    await Post.findByIdAndDelete(req.params.id);
-    res.redirect("/posts");
-  } catch (error) {
-    console.error(error);
-    res.render("error", { message: "Failed to delete post" });
-  }
+app.delete("/posts/:id/delete", (req, res) => {
+  posts = posts.filter((p) => p.id != req.params.id); // Видаляємо пост за ID
+  res.redirect("/posts");
 });
 
-// Запуск програми
-start();
+// Запуск сервера
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
+});

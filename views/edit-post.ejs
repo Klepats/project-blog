@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html>
   <head>
     <%- include('./partials/header.ejs') %>
+    <title><%= title %></title>
   </head>
   <body>
     <%- include('./partials/nav.ejs') %>
@@ -11,7 +11,7 @@
         <p class="text-center text-muted">
           Edit the details of your post below and click "Update Post" to save changes.
         </p>
-        <form method="POST" action="/posts/<%= post._id %>/edit">
+        <form method="POST" action="/posts/<%= post.id || post._id %>/edit?_method=PUT">
           <!-- Додано для підтримки PUT-запиту -->
           <input type="hidden" name="_method" value="PUT" />
           <div class="mb-3">
@@ -22,7 +22,7 @@
               class="form-control"
               id="postTitle"
               name="title"
-              value="<%= post.title %>" <!-- Автозаповнення -->
+              value="<%- post.title %>"
             />
           </div>
           <div class="mb-3">
@@ -33,7 +33,7 @@
               class="form-control"
               id="postAuthor"
               name="author"
-              value="<%= post.author %>" <!-- Автозаповнення -->
+              value="<%- post.author %>"
             />
           </div>
           <div class="mb-3">
@@ -44,7 +44,7 @@
               id="postDescription"
               name="description"
               rows="4"
-            ><%= post.description %></textarea> <!-- Автозаповнення -->
+            ><%- post.description %></textarea>
           </div>
           <button type="submit" class="btn btn-warning w-100">Оновити пост</button>
         </form>

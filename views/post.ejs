@@ -25,9 +25,9 @@
         <tr id="id_<%= post._id %>" class="">
           <td><%= post.title %></td>
           <td><%= post.author %></td>
-          <td><a href="/edit-post/<%= post._id %>">Edit</a></td>
+          <td><a href="/edit-post/<%= post.id %>">Edit</a></td>
           <td>
-            <a class="confirmDeletion" href="" data-id="<%= post._id %>"
+            <a class="confirmDeletion" href="" data-id="<%= post.id %>"
               >Delete</a
             >
           </td>
